@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% set activePage = 'employeeRegister' %}
+{% block title %}Registrar Empleado{% endblock %}
+{% block pageTitle %}Registrar Nuevo Empleado{% endblock %}
+
+{% block content %}
+<div class="pageHeader">
+    <div class="pageHeaderText">
+        <h1>Registrar Empleado</h1>
+        <p>Ingresa la información básica para dar de alta un nuevo integrante.</p>
+    </div>
+    <a href="{% if url_for is defined %}{{ url_for('employees.list') }}{% else %}list.html{% endif %}" class="btn btnSecondary">
+        <i class="fa-solid fa-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="card" style="max-width:760px;margin:0 auto">
+    <div class="cardHeader">
+        <div style="display:flex;align-items:center;gap:0.5rem">
+            <i class="fa-solid fa-user-plus" style="color:var(--primary)"></i>
+            <h2 class="cardTitle">Alta de Personal</h2>
+        </div>
+        <span style="font-size:0.75rem;color:var(--textMuted)">(*) Campos obligatorios</span>
+    </div>
+    <div class="cardBody">
+        <div class="alert alertInfo" style="margin-bottom:0.75rem;padding:0.5rem 0.85rem">
+            <div class="alertIcon"><i class="fa-solid fa-circle-info"></i></div>
+            <div class="alertContent">
+                <div class="alertTitle">Nota:</div>
+                <div style="font-size:0.8rem">Todos los empleados nuevos se registran automáticamente como <strong>ACTIVE</strong>.</div>
+            </div>
+        </div>
+
+        <form action="{% if url_for is defined %}{{ url_for('employees.register') }}{% else %}#{% endif %}" method="POST" data-validate>
+            <div class="formGrid">
+                <div class="formGroup" style="grid-column:1/-1">
+                    <label for="fullName" class="formLabel">Nombre completo <span class="required">*</span></label>
+                    <input type="text" id="fullName" name="fullName" class="formControl" placeholder="Ej: Juan Pérez" required autocomplete="off">
+                    <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Campo requerido</div>
+                </div>
+
+                <div class="formGroup">
+                    <label for="document" class="formLabel">Documento <span class="required">*</span></label>
+                    <input type="text" id="document" name="document" class="formControl" placeholder="Ej: 123456789" required autocomplete="off">
+                    <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Documento requerido</div>
+                </div>
+
+                <div class="formGroup">
+                    <label for="hireDate" class="formLabel">Fecha de ingreso <span class="required">*</span></label>
+                    <input type="date" id="hireDate" name="hireDate" class="formControl" required>
+                    <div class="formError" style="display:none"><i class="fa-solid fa-calendar-xmark"></i> Fecha requerida</div>
+                </div>
+
+                <div class="formGroup" style="grid-column:1/-1">
+                    <label class="formLabel">Estado inicial</label>
+                    <div class="readonlyStatusBox">
+                        <span class="badge badgeActive"><span class="badgeDot"></span> ACTIVE</span>
+                        <span class="formHint">(Asignado automáticamente)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex;justify-content:flex-end;gap:0.5rem;margin-top:0.85rem;padding-top:0.65rem;border-top:1px solid var(--border)">
+                <a href="{% if url_for is defined %}{{ url_for('employees.list') }}{% else %}list.html{% endif %}" class="btn btnSecondary">Cancelar</a>
+                <button type="submit" class="btn btnPrimary"><i class="fa-solid fa-check"></i> Registrar empleado</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

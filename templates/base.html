@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestión de Empleados{% endblock %} - Panel Administrativo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') if url_for is defined else '../static/css/styles.css' }}">
+    {% block extraCss %}{% endblock %}
+</head>
+<body>
+    <div class="appLayout">
+        <div class="sidebarOverlay" id="sidebarOverlay"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebarHeader">
+                <a href="{% if url_for is defined %}{{ url_for('dashboard') }}{% else %}dashboard.html{% endif %}" class="sidebarBrand">
+                    <div class="brandIcon"><i class="fa-solid fa-users-gear"></i></div>
+                    <span>EmpControl</span>
+                </a>
+            </div>
+
+            <nav class="sidebarNav">
+                <div class="navSectionTitle">Menú Principal</div>
+                <a href="{% if url_for is defined %}{{ url_for('dashboard') }}{% else %}dashboard.html{% endif %}" class="navLink {% if activePage == 'dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-pie"></i><span>Dashboard</span>
+                </a>
+                <a href="{% if url_for is defined %}{{ url_for('employees.list') }}{% else %}employees/list.html{% endif %}" class="navLink {% if activePage == 'employeeList' %}active{% endif %}">
+                    <i class="fa-solid fa-users"></i><span>Empleados</span>
+                </a>
+                <a href="{% if url_for is defined %}{{ url_for('employees.register') }}{% else %}employees/register.html{% endif %}" class="navLink {% if activePage == 'employeeRegister' %}active{% endif %}">
+                    <i class="fa-solid fa-user-plus"></i><span>Registrar empleado</span>
+                </a>
+            </nav>
+
+            <div class="sidebarFooter">
+                <span>EmpControl v1.0</span>
+                <i class="fa-solid fa-shield-halved" style="color:var(--primary)"></i>
+            </div>
+        </aside>
+
+        <div class="mainWrapper">
+            <header class="topHeader">
+                <div class="headerLeft">
+                    <button type="button" class="mobileMenuToggle" id="mobileMenuToggle" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+                    <div class="pageTitleDisplay">{% block pageTitle %}Sistema Administrativo{% endblock %}</div>
+                </div>
+
+                <div class="headerRight">
+                    <button type="button" class="themeToggleBtn" id="themeToggleBtn" title="Cambiar tema"><i class="fa-solid fa-moon"></i></button>
+                    <div class="userProfile">
+                        <div class="userAvatar"><i class="fa-solid fa-user"></i></div>
+                        <div class="userInfo">
+                            <span class="userName">Administrador</span>
+                            <span class="userRole">Gestión Humana</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="contentArea">
+                <div class="alertsContainer" id="alertsContainer">
+                    {% if get_flashed_messages is defined %}
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert{{ category|capitalize if category in ['success', 'error', 'warning', 'info', 'danger'] else 'Info' }}">
+                                        <div class="alertIcon"><i class="fa-solid fa-circle-info"></i></div>
+                                        <div class="alertContent"><div>{{ message }}</div></div>
+                                        <button type="button" class="alertClose" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                    {% endif %}
+                    {% block customAlerts %}{% endblock %}
+                </div>
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') if url_for is defined else '../static/js/app.js' }}"></script>
+    {% block extraJs %}{% endblock %}
+</body>
+</html>
