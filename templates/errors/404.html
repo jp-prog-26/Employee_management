@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}404 - No Encontrada{% endblock %}
+{% block page_title %}Error 404{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:500px;margin:2rem auto;text-align:center">
+    <div class="card-body" style="padding:2rem 1.5rem">
+        <div style="width:60px;height:60px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1rem">
+            <i class="fa-solid fa-compass-drafting"></i>
+        </div>
+        <h1 style="font-size:1.5rem;font-weight:800;margin-bottom:0.5rem">404 - Página No Encontrada</h1>
+        <p style="color:var(--text-sec);font-size:0.9rem;margin-bottom:1.5rem">La página que buscas no existe o ha sido movida.</p>
+        <div style="display:flex;justify-content:center;gap:0.75rem">
+            <a href="{% if url_for is defined %}{{ url_for('dashboard') }}{% else %}../dashboard.html{% endif %}" class="btn btn-primary"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="{% if url_for is defined %}{{ url_for('employees.list') }}{% else %}../employees/list.html{% endif %}" class="btn btn-secondary"><i class="fa-solid fa-users"></i> Empleados</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

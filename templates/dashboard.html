@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% set activePage = 'dashboard' %}
+{% block title %}Dashboard{% endblock %}
+{% block pageTitle %}Dashboard General{% endblock %}
+
+{% block content %}
+<div class="pageHeader">
+    <div class="pageHeaderText">
+        <h1>Panel de Control</h1>
+        <p>Resumen general y estado actual de la plantilla de empleados.</p>
+    </div>
+    <div class="headerRight">
+        <a href="{% if url_for is defined %}{{ url_for('employees.register') }}{% else %}employees/register.html{% endif %}" class="btn btnPrimary">
+            <i class="fa-solid fa-user-plus"></i> + Registrar empleado
+        </a>
+        <a href="{% if url_for is defined %}{{ url_for('employees.list') }}{% else %}employees/list.html{% endif %}" class="btn btnSecondary">
+            <i class="fa-solid fa-list-check"></i> Consultar empleados
+        </a>
+    </div>
+</div>
+
+<div class="statsGrid">
+    <div class="statCard">
+        <div><div class="statLabel">TOTAL EMPLEADOS</div><div class="statValue">{{ totalEmployees|default(25) }}</div></div>
+        <div class="statIconWrapper statIconPrimary"><i class="fa-solid fa-users"></i></div>
+    </div>
+    <div class="statCard">
+        <div><div class="statLabel">ACTIVE</div><div class="statValue" style="color:var(--successDark)">{{ activeEmployees|default(20) }}</div></div>
+        <div class="statIconWrapper statIconSuccess"><i class="fa-solid fa-user-check"></i></div>
+    </div>
+    <div class="statCard">
+        <div><div class="statLabel">INACTIVE</div><div class="statValue" style="color:var(--textSec)">{{ inactiveEmployees|default(5) }}</div></div>
+        <div class="statIconWrapper statIconDanger"><i class="fa-solid fa-user-slash"></i></div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="cardHeader">
+        <div style="display:flex;align-items:center;gap:0.5rem"><i class="fa-solid fa-clock-rotate-left" style="color:var(--primary)"></i><h2 class="cardTitle">Empleados Registrados Recientemente</h2></div>
+        <a href="{% if url_for is defined %}{{ url_for('employees.list') }}{% else %}employees/list.html{% endif %}" class="btn btnSm btnSecondary">Ver todos</a>
+    </div>
+    <div class="tableResponsive">
+        <table class="table">
+            <thead>
+                <tr><th>Documento</th><th>Nombre</th><th>Ingreso</th><th>Estado</th><th style="text-align:right">Acción</th></tr>
+            </thead>
+            <tbody>
+                {% set list = recentEmployees if recentEmployees is defined and recentEmployees else [
+                    {'id':1,'document':'123456789','fullName':'Juan Pérez','hireDate':'01/08/2026','status':'ACTIVE'},
+                    {'id':2,'document':'987654321','fullName':'María López','hireDate':'15/07/2026','status':'ACTIVE'},
+                    {'id':3,'document':'456789123','fullName':'Carlos Gómez','hireDate':'01/02/2026','status':'INACTIVE'}
+                ] %}
+                {% for emp in list %}
+                <tr>
+                    <td class="fontMono">{{ emp.document }}</td>
+                    <td style="font-weight:600">{{ emp.fullName }}</td>
+                    <td>{{ emp.hireDate }}</td>
+                    <td>
+                        <span class="badge {{ 'badgeActive' if emp.status == 'ACTIVE' else 'badgeInactive' }}">
+                            <span class="badgeDot"></span> {{ emp.status }}
+                        </span>
+                    </td>
+                    <td style="text-align:right">
+                        <a href="{% if url_for is defined %}{{ url_for('employees.detail', id=emp.id) }}{% else %}employees/detail.html{% endif %}" class="btn btnSm btnSecondary"><i class="fa-regular fa-eye"></i> Ver</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

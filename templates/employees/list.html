@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% set activePage = 'employeeList' %}
+{% block title %}Lista de Empleados{% endblock %}
+{% block pageTitle %}Gestión de Empleados{% endblock %}
+
+{% block content %}
+<div class="pageHeader">
+    <div class="pageHeaderText">
+        <h1>Empleados</h1>
+        <p>Gestiona y consulta la información del personal.</p>
+    </div>
+    <a href="{% if url_for is defined %}{{ url_for('employees.register') }}{% else %}register.html{% endif %}" class="btn btnPrimary">
+        <i class="fa-solid fa-user-plus"></i> + Registrar empleado
+    </a>
+</div>
+
+<div class="toolbarCard">
+    <div class="searchBox">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="tableSearch" class="formControl searchInput" placeholder="Buscar por documento o nombre..." autocomplete="off">
+    </div>
+    <div class="filterPills">
+        <button type="button" class="filterBtn active" data-filter="ALL">Todos</button>
+        <button type="button" class="filterBtn" data-filter="ACTIVE">ACTIVE</button>
+        <button type="button" class="filterBtn" data-filter="INACTIVE">INACTIVE</button>
+    </div>
+</div>
+
+<div id="uiStatesContainer">
+    <div id="tableViewState" class="card">
+        <div class="tableResponsive">
+            <table class="table" id="employeeTable">
+                <thead>
+                    <tr><th>Documento</th><th>Nombre completo</th><th>Ingreso</th><th>Finalización</th><th>Estado</th><th style="text-align:right">Acciones</th></tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                    {% set list = employees if employees is defined and employees else [
+                        {'id':1,'document':'123456789','fullName':'Juan Pérez','hireDate':'01/08/2026','endDate':None,'status':'ACTIVE'},
+                        {'id':2,'document':'987654321','fullName':'María López','hireDate':'15/07/2026','endDate':None,'status':'ACTIVE'},
+                        {'id':3,'document':'456789123','fullName':'Carlos Gómez','hireDate':'01/02/2026','endDate':'15/08/2026','status':'INACTIVE'}
+                    ] %}
+                    {% for emp in list %}
+                    <tr>
+                        <td class="fontMono">{{ emp.document }}</td>
+                        <td style="font-weight:600">{{ emp.fullName }}</td>
+                        <td>{{ emp.hireDate }}</td>
+                        <td>{{ emp.endDate if emp.endDate else '—' }}</td>
+                        <td>
+                            <span class="badge {{ 'badgeActive' if emp.status == 'ACTIVE' else 'badgeInactive' }}">
+                                <span class="badgeDot"></span> {{ emp.status }}
+                            </span>
+                        </td>
+                        <td style="text-align:right">
+                            <a href="{% if url_for is defined %}{{ url_for('employees.detail', id=emp.id) }}{% else %}detail.html{% endif %}" class="btn btnSm btnSecondary"><i class="fa-regular fa-eye"></i> Ver</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div id="searchEmptyState" class="emptyState" style="display:none;padding:1.5rem">
+            <div class="stateIcon"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <h3 class="stateTitle">Sin coincidencias</h3>
+            <p class="stateDescription">No se encontraron empleados que coincidan.</p>
+        </div>
+    </div>
+
+    <div id="loadingViewState" class="card" style="display:none">
+        <div class="loadingState">
+            <div class="spinner"></div>
+            <h3 class="stateTitle">Cargando empleados...</h3>
+        </div>
+    </div>
+
+    <div id="emptyViewState" class="card" style="display:none">
+        <div class="emptyState">
+            <div class="stateIcon"><i class="fa-solid fa-users-slash"></i></div>
+            <h3 class="stateTitle">No hay empleados registrados.</h3>
+            <p class="stateDescription">Registra el primer empleado para comenzar.</p>
+            <a href="{% if url_for is defined %}{{ url_for('employees.register') }}{% else %}register.html{% endif %}" class="btn btnPrimary"><i class="fa-solid fa-user-plus"></i> Registrar empleado</a>
+        </div>
+    </div>
+
+    <div id="errorViewState" class="card" style="display:none">
+        <div class="errorState">
+            <div class="stateIcon"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <h3 class="stateTitle">No pudimos cargar la información.</h3>
+            <button type="button" class="btn btnPrimary" onclick="location.reload();"><i class="fa-solid fa-rotate-right"></i> Intentar nuevamente</button>
+        </div>
+    </div>
+</div>
+
+<div class="demoStateBar">
+    <div><i class="fa-solid fa-flask" style="color:var(--primary)"></i> Vistas UI:</div>
+    <div style="display:flex;gap:0.25rem">
+        <button type="button" class="btn btnSm btnPrimary" data-demo-state="table">Tabla</button>
+        <button type="button" class="btn btnSm btnSecondary" data-demo-state="loading">Loading</button>
+        <button type="button" class="btn btnSm btnSecondary" data-demo-state="empty">Empty</button>
+        <button type="button" class="btn btnSm btnSecondary" data-demo-state="error">Error</button>
+    </div>
+</div>
+{% endblock %}

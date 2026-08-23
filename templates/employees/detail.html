@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% set activePage = 'employeeList' %}
+{% block title %}Detalle del Empleado{% endblock %}
+{% block pageTitle %}Ficha de Empleado{% endblock %}
+
+{% block content %}
+{% set empStatus = employee.status if employee is defined else 'ACTIVE' %}
+{% set empName = employee.fullName if employee is defined and employee.fullName else (employee.full_name if employee is defined else 'Juan Pérez') %}
+{% set empDoc = employee.document if employee is defined else '123456789' %}
+{% set empHire = employee.hireDate if employee is defined and employee.hireDate else (employee.hire_date if employee is defined else '01/08/2026') %}
+{% set empEnd = employee.endDate if employee is defined and employee.endDate else (employee.end_date if (employee is defined and employee.end_date) else '—') %}
+
+<div class="pageHeader">
+    <div class="pageHeaderText">
+        <a href="{% if url_for is defined %}{{ url_for('employees.list') }}{% else %}list.html{% endif %}" class="btn btnSm btnSecondary" style="margin-bottom:0.4rem">
+            <i class="fa-solid fa-arrow-left"></i> Volver a la lista
+        </a>
+        <h1>Ficha de Empleado</h1>
+    </div>
+    {% if empStatus == 'ACTIVE' %}
+    <button type="button" class="btn btnOutlineDanger" data-modal-target="#modalFinalizarContrato">
+        <i class="fa-solid fa-file-contract"></i> Finalizar contrato
+    </button>
+    {% endif %}
+</div>
+
+{% if empStatus == 'INACTIVE' %}
+<div class="alert alertWarning" style="margin-bottom:0.75rem">
+    <div class="alertIcon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    <div class="alertContent">El empleado está <strong>INACTIVE</strong>. Contrato finalizado.</div>
+</div>
+{% endif %}
+
+<div class="card" style="margin-bottom:0.75rem">
+    <div class="detailCardHeader">
+        <div class="profileAvatarLarge"><i class="fa-solid fa-user"></i></div>
+        <div>
+            <h2 style="font-size:1.15rem;font-weight:800">{{ empName }}</h2>
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.1rem">
+                <span class="fontMono" style="color:var(--textSec);font-size:0.8rem">Doc: {{ empDoc }}</span>
+                <span class="badge {{ 'badgeActive' if empStatus == 'ACTIVE' else 'badgeInactive' }}"><span class="badgeDot"></span> {{ empStatus }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="infoGrid">
+        <div class="infoItem"><span class="infoItemLabel">Nombre</span><span class="infoItemValue">{{ empName }}</span></div>
+        <div class="infoItem"><span class="infoItemLabel">Documento</span><span class="infoItemValue fontMono">{{ empDoc }}</span></div>
+        <div class="infoItem"><span class="infoItemLabel">Ingreso</span><span class="infoItemValue"><i class="fa-regular fa-calendar-check" style="color:var(--success)"></i> {{ empHire }}</span></div>
+        <div class="infoItem"><span class="infoItemLabel">Finalización</span><span class="infoItemValue">{{ empEnd }}</span></div>
+        <div class="infoItem"><span class="infoItemLabel">Estado</span><div><span class="badge {{ 'badgeActive' if empStatus == 'ACTIVE' else 'badgeInactive' }}"><span class="badgeDot"></span> {{ empStatus }}</span></div></div>
+    </div>
+
+    <div class="cardFooter" style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:0.8rem;color:var(--textSec)"><i class="fa-solid fa-circle-info" style="color:var(--primary)"></i> Información administrativa</span>
+        {% if empStatus == 'ACTIVE' %}
+        <button type="button" class="btn btnSm btnOutlineDanger" data-modal-target="#modalFinalizarContrato"><i class="fa-solid fa-file-contract"></i> Finalizar contrato</button>
+        {% endif %}
+    </div>
+</div>
+
+<div class="demoStateBar">
+    <div><i class="fa-solid fa-sliders" style="color:var(--primary)"></i> Prueba estado:</div>
+    <div style="display:flex;gap:0.25rem">
+        <button type="button" class="btn btnSm btnPrimary" onclick="toggleDemoStatus('ACTIVE')">ACTIVE</button>
+        <button type="button" class="btn btnSm btnSecondary" onclick="toggleDemoStatus('INACTIVE')">INACTIVE</button>
+    </div>
+</div>
+
+<div class="modalOverlay" id="modalFinalizarContrato">
+    <div class="modalDialog">
+        <div class="modalHeader">
+            <h3 class="modalTitle">Finalizar contrato</h3>
+            <button type="button" class="modalClose" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form action="{% if url_for is defined and employee is defined %}{{ url_for('employees.end_contract', id=employee.id) }}{% else %}#{% endif %}" method="POST" data-validate>
+            <div class="modalBody">
+                <p style="font-weight:600;margin-bottom:0.75rem">¿Deseas registrar la finalización del contrato de <strong>{{ empName }}</strong>?</p>
+                <div class="formGroup">
+                    <label for="endDate" class="formLabel">Fecha de finalización <span class="required">*</span></label>
+                    <input type="date" id="endDate" name="endDate" class="formControl" required>
+                    <div class="formError" style="display:none"><i class="fa-solid fa-calendar-xmark"></i> Fecha requerida</div>
+                </div>
+                <div class="alert alertWarning" style="margin-bottom:0;padding:0.5rem 0.75rem">
+                    <div class="alertIcon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div style="font-size:0.8rem">Esta acción cambiará el estado a <strong>INACTIVE</strong>.</div>
+                </div>
+            </div>
+            <div class="modalFooter">
+                <button type="button" class="btn btnSecondary" data-close-modal>Cancelar</button>
+                <button type="submit" class="btn btnDanger"><i class="fa-solid fa-ban"></i> Confirmar finalización</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleDemoStatus(s){ const u=new URL(location.href); u.searchParams.set('demoStatus',s); location.href=u.href; }
+</script>
+{% endblock %}
