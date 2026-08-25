@@ -5,10 +5,17 @@
 
 {% block content %}
 {% set empStatus = employee.status if employee is defined else 'ACTIVE' %}
-{% set empName = employee.fullName if employee is defined and employee.fullName else (employee.full_name if employee is defined else 'Juan Pérez') %}
-{% set empDoc = employee.document if employee is defined else '123456789' %}
-{% set empHire = employee.hireDate if employee is defined and employee.hireDate else (employee.hire_date if employee is defined else '01/08/2026') %}
-{% set empEnd = employee.endDate if employee is defined and employee.endDate else (employee.end_date if (employee is defined and employee.end_date) else '—') %}
+{% set empName = employee.fullName if employee is defined and employee.fullName else 'Sin nombre' %}
+{% set empDoc = employee.document if employee is defined else '—' %}
+{% set empHire = employee.hireDate if employee is defined and employee.hireDate else '—' %}
+{% set empEnd = employee.endDate if employee is defined and employee.endDate else '—' %}
+
+{% if error %}
+<div class="alert alertDanger" style="margin-bottom:0.75rem">
+    <div class="alertIcon"><i class="fa-solid fa-circle-exclamation"></i></div>
+    <div class="alertContent">{{ error }}</div>
+</div>
+{% endif %}
 
 <div class="pageHeader">
     <div class="pageHeaderText">
@@ -59,13 +66,7 @@
     </div>
 </div>
 
-<div class="demoStateBar">
-    <div><i class="fa-solid fa-sliders" style="color:var(--primary)"></i> Prueba estado:</div>
-    <div style="display:flex;gap:0.25rem">
-        <button type="button" class="btn btnSm btnPrimary" onclick="toggleDemoStatus('ACTIVE')">ACTIVE</button>
-        <button type="button" class="btn btnSm btnSecondary" onclick="toggleDemoStatus('INACTIVE')">INACTIVE</button>
-    </div>
-</div>
+
 
 <div class="modalOverlay" id="modalFinalizarContrato">
     <div class="modalDialog">
@@ -93,8 +94,4 @@
         </form>
     </div>
 </div>
-
-<script>
-function toggleDemoStatus(s){ const u=new URL(location.href); u.searchParams.set('demoStatus',s); location.href=u.href; }
-</script>
 {% endblock %}
