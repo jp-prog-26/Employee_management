@@ -31,25 +31,33 @@
             </div>
         </div>
 
-        <form action="{% if url_for is defined %}{{ url_for('employees.register') }}{% else %}#{% endif %}" method="POST" data-validate>
+        {% if error %}
+        <div class="alert alertDanger" style="margin-bottom:0.75rem">
+            <div class="alertIcon"><i class="fa-solid fa-circle-exclamation"></i></div>
+            <div class="alertContent">{{ error }}</div>
+        </div>
+        {% endif %}
+
+        <form action="{{ url_for('employees.register') }}" method="POST" data-validate>
             <div class="formGrid">
                 <div class="formGroup" style="grid-column:1/-1">
                     <label for="fullName" class="formLabel">Nombre completo <span class="required">*</span></label>
-                    <input type="text" id="fullName" name="fullName" class="formControl" placeholder="Ej: Juan Pérez" required autocomplete="off">
+                    <input type="text" id="fullName" name="fullName" class="formControl" placeholder="Ej: Juan Pérez" required autocomplete="off" value="{{ form_data.fullName if form_data else '' }}">
                     <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Campo requerido</div>
                 </div>
 
                 <div class="formGroup">
                     <label for="document" class="formLabel">Documento <span class="required">*</span></label>
-                    <input type="text" id="document" name="document" class="formControl" placeholder="Ej: 123456789" required autocomplete="off">
+                    <input type="text" id="document" name="document" class="formControl" placeholder="Ej: 123456789" required autocomplete="off" value="{{ form_data.document if form_data else '' }}">
                     <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Documento requerido</div>
                 </div>
 
                 <div class="formGroup">
                     <label for="hireDate" class="formLabel">Fecha de ingreso <span class="required">*</span></label>
-                    <input type="date" id="hireDate" name="hireDate" class="formControl" required>
+                    <input type="date" id="hireDate" name="hireDate" class="formControl" required value="{{ form_data.hireDate if form_data else '' }}">
                     <div class="formError" style="display:none"><i class="fa-solid fa-calendar-xmark"></i> Fecha requerida</div>
                 </div>
+
 
                 <div class="formGroup" style="grid-column:1/-1">
                     <label class="formLabel">Estado inicial</label>

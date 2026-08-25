@@ -1,68 +1,54 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from app.services.employee_service import EmployeeService
 
 employees_bp = Blueprint('employees', __name__)
+service = EmployeeService()
 
-# Datos de ejemplo (Mock Data)
-MOCK_EMPLOYEES = [
-    {
-        "id": 1,
-        "document": "123456789",
-        "fullName": "Juan Pérez",
-        "hireDate": "01/08/2026",
-        "endDate": None,
-        "status": "ACTIVE"
-    },
-    {
-        "id": 2,
-        "document": "987654321",
-        "fullName": "María López",
-        "hireDate": "15/07/2026",
-        "endDate": None,
-        "status": "ACTIVE"
-    },
-    {
-        "id": 3,
-        "document": "456789123",
-        "fullName": "Carlos Gómez",
-        "hireDate": "01/02/2026",
-        "endDate": "15/08/2026",
-        "status": "INACTIVE"
-    }
-]
 
 @employees_bp.route('/')
 def dashboard():
-    total = len(MOCK_EMPLOYEES)
-    active = sum(1 for e in MOCK_EMPLOYEES if e["status"] == "ACTIVE")
-    inactive = sum(1 for e in MOCK_EMPLOYEES if e["status"] == "INACTIVE")
-    return render_template(
-        'dashboard.html',
-        totalEmployees=total,
-        activeEmployees=active,
-        inactiveEmployees=inactive,
-        recentEmployees=MOCK_EMPLOYEES
-    )
+    stats = service.get_dashboard_stats()
+    return render_template('dashboard.html', **stats)
+
 
 @employees_bp.route('/employees')
 def list():
-    return render_template('employees/list.html', employees=MOCK_EMPLOYEES)
+    employees = service.get_all()
+    return render_template('employees/list.html', employees=[e.to_dict() for e in employees])
+
 
 @employees_bp.route('/employees/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'POST':
+        data = {
+            'fullName': request.form.get('fullName', ''),
+            'document': request.form.get('document', ''),
+            'hireDate': request.form.get('hireDate', ''),
+        }
+        emp, errors, code = service.create(data)
+        if errors:
+            return render_template('employees/register.html', error=errors[0], form_data=data)
+        return redirect(url_for('employees.detail', id=emp['id']))
     return render_template('employees/register.html')
+
 
 @employees_bp.route('/employees/<int:id>')
 def detail(id):
-    emp = next((e for e in MOCK_EMPLOYEES if e["id"] == id), MOCK_EMPLOYEES[0])
-    demoStatus = request.args.get('demoStatus') or request.args.get('demo_status')
-    if demoStatus in ['ACTIVE', 'INACTIVE']:
-        emp = dict(emp)
-        emp['status'] = demoStatus
-        if demoStatus == 'INACTIVE' and not emp.get('endDate'):
-            emp['endDate'] = '23/08/2026'
+    emp = service.get_by_id(id)
+    if not emp:
+        return render_template('errors/404.html'), 404
+    return render_template('employees/detail.html', employee=emp.to_dict())
 
-    return render_template('employees/detail.html', employee=emp)
 
 @employees_bp.route('/employees/<int:id>/end_contract', methods=['POST'])
 def end_contract(id):
-    return render_template('employees/detail.html', employee=MOCK_EMPLOYEES[2])
+    data = {'endDate': request.form.get('endDate', '')}
+    emp, errors, code = service.terminate(id, data)
+    if errors:
+        original = service.get_by_id(id)
+        return render_template(
+            'employees/detail.html',
+            employee=original.to_dict() if original else {},
+            error=errors[0]
+        )
+    return redirect(url_for('employees.detail', id=id))
