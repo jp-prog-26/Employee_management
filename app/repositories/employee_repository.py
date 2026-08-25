@@ -5,7 +5,7 @@ from typing import Optional, List
 
 class EmployeeRepository:
     """Capa de acceso a datos: todas las queries SQL viven aqui."""
-
+    # Consulta la lista de empleados con filtro opcional por estado o texto de búsqueda.
     def get_all(self, status: Optional[str] = None, search: Optional[str] = None) -> List[Employee]:
         db = get_db()
         query = 'SELECT * FROM employees WHERE 1=1'
@@ -37,6 +37,7 @@ class EmployeeRepository:
     def create(self, document: str, first_name: str, second_name: str,
                first_lastname: str, second_lastname: str, hire_date: str) -> Employee:
         db = get_db()
+        # Se arma el nombre completo a partir de los campos individuales.
         full_name = ' '.join(p for p in [first_name, second_name, first_lastname, second_lastname] if p and p.strip())
         cursor = db.execute(
             '''INSERT INTO employees

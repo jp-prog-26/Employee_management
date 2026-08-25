@@ -33,6 +33,7 @@ class EmployeeService:
         return self.repo.get_recent(limit)
 
     def get_dashboard_stats(self) -> dict:
+        # Se reunen conteos del estado y los empleados más recientes para la vista principal.
         counts = self.repo.count_by_status()
         recent = self.repo.get_recent(5)
         return {
@@ -51,6 +52,7 @@ class EmployeeService:
         Crea un empleado.
         Retorna (employee_dict, errors_list, http_status_code).
         """
+        # Primero se validan los datos; luego se comprueba que el documento no esté duplicado.
         errors = validate_create_input(data)
         if errors:
             return None, errors, 400

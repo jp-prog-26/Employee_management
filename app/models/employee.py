@@ -1,9 +1,22 @@
+"""Modelo principal del empleado.
+
+Representa la estructura que se guarda en la base de datos y la que se usa
+para mostrar la información en la interfaz. La clase también ayuda a convertir
+los registros de SQLite en objetos Python y viceversa.
+"""
+
 from dataclasses import dataclass, field
 from typing import Optional
 
 
 @dataclass
 class Employee:
+    """Entidad que representa a un empleado dentro de la aplicación.
+
+    Aporta una forma clara de trabajar con los datos del empleado en
+    servicio, repositorio y vistas, evitando manipular diccionarios sueltos.
+    """
+
     id: int
     document: str
     firstName: str
@@ -22,6 +35,11 @@ class Employee:
 
     @staticmethod
     def from_row(row) -> 'Employee':
+        """Crea un objeto Employee a partir de una fila de SQLite.
+
+        Esta compatibilidad permite leer tanto registros nuevos como datos antiguos
+        que puedan venir con el campo full_name y sin columnas separadas.
+        """
         keys = row.keys() if hasattr(row, 'keys') else []
         first_name = (row['first_name'] or '') if 'first_name' in keys else ''
         second_name = (row['second_name'] or '') if 'second_name' in keys else ''
@@ -54,6 +72,7 @@ class Employee:
         )
 
     def to_dict(self) -> dict:
+        """Convierte el objeto a un diccionario para enviarlo a templates o JSON."""
         return {
             'id': self.id,
             'document': self.document,

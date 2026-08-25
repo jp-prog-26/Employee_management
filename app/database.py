@@ -2,12 +2,13 @@ import sqlite3
 import os
 from flask import g, current_app
 
+# Nombre de la base de datos local de la app.
 DATABASE_NAME = 'employees.db'
-
 
 def get_db():
     """Retorna la conexion de BD del contexto actual de la request."""
     if 'db' not in g:
+        # Se guarda la conexión en el contexto de Flask para reutilizarla durante la request.
         db_path = os.path.join(current_app.instance_path, DATABASE_NAME)
         os.makedirs(current_app.instance_path, exist_ok=True)
         g.db = sqlite3.connect(db_path)
@@ -44,7 +45,7 @@ def init_db(app):
             )
         ''')
 
-        # Migración: agrega columnas nuevas si la BD ya existia con el schema anterior
+        # Compatibilidad con versiones previas: si la tabla ya existe, se agregan columnas faltantes.
         migrations = [
             ('first_name',      "TEXT NOT NULL DEFAULT ''"),
             ('second_name',     "TEXT DEFAULT ''"),
