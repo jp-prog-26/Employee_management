@@ -2,11 +2,17 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.egg-info/
 
-# Entorno virtual
+# Entornos virtuales
+venv/
+env/
 .venv/
 
-# Flask / Base de datos local
+# Variables de entorno / config sensible
+.env
 instance/
+
+# Base de datos SQLite (cada dev genera la suya en local)
 *.db
-
+*.sqlite3
