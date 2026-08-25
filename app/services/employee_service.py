@@ -5,7 +5,7 @@ from app.validators.input_validator import (
 from app.validators.business_validator import (
     validate_no_duplicate_document, validate_date_order, validate_not_already_inactive
 )
-from app.messages.messages import MSG_NOT_FOUND
+from app.messages.messages import MSG_NOT_FOUND, MSG_INVALID_STATUS
 from typing import Optional, List
 from app.models.employee import Employee
 
@@ -33,6 +33,7 @@ class EmployeeService:
         return self.repo.get_recent(limit)
 
     def get_dashboard_stats(self) -> dict:
+        # Se reunen conteos del estado y los empleados más recientes para la vista principal.
         counts = self.repo.count_by_status()
         recent = self.repo.get_recent(5)
         return {
@@ -51,6 +52,7 @@ class EmployeeService:
         Crea un empleado.
         Retorna (employee_dict, errors_list, http_status_code).
         """
+        # Primero se validan los datos; luego se comprueba que el documento no esté duplicado.
         errors = validate_create_input(data)
         if errors:
             return None, errors, 400

@@ -1,3 +1,9 @@
+"""Rutas web para gestionar empleados.
+
+Estas rutas conectan la vista HTML con el servicio de negocio: reciben datos del
+formulario, los validan y redirigen al usuario según el resultado.
+"""
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.services.employee_service import EmployeeService
 from app.messages.messages import (
@@ -22,6 +28,7 @@ def list():
 
 @employees_bp.route('/employees/register', methods=['GET', 'POST'])
 def register():
+    # El formulario puede venir en GET para mostrar la vista o en POST para crear el registro.
     if request.method == 'POST':
         data = {
             'firstName':      request.form.get('firstName', ''),
@@ -96,4 +103,4 @@ def delete(id):
             error=errors[0]
         )
     flash(MSG_DELETED, 'success')
-    return redirect(url_for('employees.list'))
+    return redirect(url_for('employees.list'))
