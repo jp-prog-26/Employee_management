@@ -23,14 +23,6 @@
         <span style="font-size:0.75rem;color:var(--textMuted)">(*) Campos obligatorios</span>
     </div>
     <div class="cardBody">
-        <div class="alert alertInfo" style="margin-bottom:0.75rem;padding:0.5rem 0.85rem">
-            <div class="alertIcon"><i class="fa-solid fa-circle-info"></i></div>
-            <div class="alertContent">
-                <div class="alertTitle">Nota:</div>
-                <div style="font-size:0.8rem">Todos los empleados nuevos se registran automáticamente como <strong>ACTIVE</strong>.</div>
-            </div>
-        </div>
-
         {% if error %}
         <div class="alert alertDanger" style="margin-bottom:0.75rem">
             <div class="alertIcon"><i class="fa-solid fa-circle-exclamation"></i></div>
@@ -38,18 +30,38 @@
         </div>
         {% endif %}
 
-        <form action="{{ url_for('employees.register') }}" method="POST" data-validate>
+        <form action="{{ url_for('employees.register') }}" method="POST" data-validate novalidate>
             <div class="formGrid">
-                <div class="formGroup" style="grid-column:1/-1">
-                    <label for="fullName" class="formLabel">Nombre completo <span class="required">*</span></label>
-                    <input type="text" id="fullName" name="fullName" class="formControl" placeholder="Ej: Juan Pérez" required autocomplete="off" value="{{ form_data.fullName if form_data else '' }}">
-                    <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Campo requerido</div>
+                <!-- Nombres -->
+                <div class="formGroup">
+                    <label for="firstName" class="formLabel">Primer nombre <span class="required">*</span></label>
+                    <input type="text" id="firstName" name="firstName" minlength="2" data-type="name" class="formControl" placeholder="Ej: Juan" required autocomplete="off" value="{{ form_data.firstName if form_data else '' }}">
+                    <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Campo obligatorio</div>
+                </div>
+
+                <div class="formGroup">
+                    <label for="secondName" class="formLabel">Segundo nombre <span style="color:var(--textMuted);font-weight:400">(opcional)</span></label>
+                    <input type="text" id="secondName" name="secondName" minlength="2" data-type="name" class="formControl" placeholder="Ej: Andrés" autocomplete="off" value="{{ form_data.secondName if form_data else '' }}">
+                    <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Solo debe contener letras</div>
+                </div>
+
+                <!-- Apellidos -->
+                <div class="formGroup">
+                    <label for="firstLastname" class="formLabel">Primer apellido <span class="required">*</span></label>
+                    <input type="text" id="firstLastname" name="firstLastname" minlength="2" data-type="name" class="formControl" placeholder="Ej: Pérez" required autocomplete="off" value="{{ form_data.firstLastname if form_data else '' }}">
+                    <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Campo obligatorio</div>
+                </div>
+
+                <div class="formGroup">
+                    <label for="secondLastname" class="formLabel">Segundo apellido <span style="color:var(--textMuted);font-weight:400">(opcional)</span></label>
+                    <input type="text" id="secondLastname" name="secondLastname" minlength="2" data-type="name" class="formControl" placeholder="Ej: Gómez" autocomplete="off" value="{{ form_data.secondLastname if form_data else '' }}">
+                    <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Solo debe contener letras</div>
                 </div>
 
                 <div class="formGroup">
                     <label for="document" class="formLabel">Documento <span class="required">*</span></label>
-                    <input type="text" id="document" name="document" class="formControl" placeholder="Ej: 123456789" required autocomplete="off" value="{{ form_data.document if form_data else '' }}">
-                    <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Documento requerido</div>
+                    <input type="text" id="document" name="document" minlength="3" data-type="digits" inputmode="numeric" class="formControl" placeholder="Ej: 123456789" required autocomplete="off" value="{{ form_data.document if form_data else '' }}">
+                    <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Documento obligatorio</div>
                 </div>
 
                 <div class="formGroup">
@@ -57,7 +69,6 @@
                     <input type="date" id="hireDate" name="hireDate" class="formControl" required value="{{ form_data.hireDate if form_data else '' }}">
                     <div class="formError" style="display:none"><i class="fa-solid fa-calendar-xmark"></i> Fecha requerida</div>
                 </div>
-
 
                 <div class="formGroup" style="grid-column:1/-1">
                     <label class="formLabel">Estado inicial</label>

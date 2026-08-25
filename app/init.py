@@ -3,6 +3,7 @@ from app.database import init_db
 
 def create_app():
     app = Flask(__name__, template_folder='../templates', static_folder='../static')
+    app.secret_key = 'empcontrol-secret-key-2026'
 
     # Inicializar SQLite (crea la tabla si no existe)
     init_db(app)
