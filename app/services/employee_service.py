@@ -61,10 +61,52 @@ class EmployeeService:
 
         emp = self.repo.create(
             document=data['document'].strip(),
-            full_name=data['fullName'].strip(),
+            first_name=data['firstName'].strip(),
+            second_name=data.get('secondName', '').strip(),
+            first_lastname=data['firstLastname'].strip(),
+            second_lastname=data.get('secondLastname', '').strip(),
             hire_date=data['hireDate'].strip(),
         )
         return emp.to_dict(), [], 201
+
+    def update(self, employee_id: int, data: dict) -> tuple:
+        """
+        Actualiza los datos de un empleado.
+        Retorna (employee_dict, errors_list, http_status_code).
+        """
+        emp = self.repo.get_by_id(employee_id)
+        if not emp:
+            return None, [MSG_NOT_FOUND], 404
+
+        errors = validate_create_input(data)
+        if errors:
+            return None, errors, 400
+
+        errors += validate_no_duplicate_document(self.repo, data['document'].strip(), exclude_id=employee_id)
+        if errors:
+            return None, errors, 409
+
+        status = data.get('status', emp.status).strip().upper() if data.get('status') else emp.status
+        if status not in ('ACTIVE', 'INACTIVE'):
+            return None, [MSG_INVALID_STATUS], 400
+
+        # Solo validar orden de fechas si se mantiene INACTIVE y tiene fecha de fin
+        if status == 'INACTIVE' and emp.endDate:
+            errors += validate_date_order(data['hireDate'].strip(), emp.endDate)
+            if errors:
+                return None, errors, 400
+
+        updated_emp = self.repo.update(
+            employee_id=employee_id,
+            document=data['document'].strip(),
+            first_name=data['firstName'].strip(),
+            second_name=data.get('secondName', '').strip(),
+            first_lastname=data['firstLastname'].strip(),
+            second_lastname=data.get('secondLastname', '').strip(),
+            hire_date=data['hireDate'].strip(),
+            status=status,
+        )
+        return updated_emp.to_dict(), [], 200
 
     def update_status(self, employee_id: int, data: dict) -> tuple:
         """Actualiza el estado de un empleado."""

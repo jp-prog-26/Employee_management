@@ -24,18 +24,38 @@ def close_db(e=None):
 
 
 def init_db(app):
-    """Crea las tablas si no existen y registra el teardown."""
+    """Crea las tablas si no existen, aplica migraciones y registra el teardown."""
     with app.app_context():
         db = get_db()
+
+        # Crear tabla base (incluye las 4 columnas de nombre + full_name para compatibilidad)
         db.execute('''
             CREATE TABLE IF NOT EXISTS employees (
-                id        INTEGER PRIMARY KEY AUTOINCREMENT,
-                document  TEXT    NOT NULL UNIQUE,
-                full_name TEXT    NOT NULL,
-                hire_date TEXT    NOT NULL,
-                end_date  TEXT,
-                status    TEXT    NOT NULL DEFAULT 'ACTIVE'
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                document        TEXT    NOT NULL UNIQUE,
+                first_name      TEXT    NOT NULL DEFAULT '',
+                second_name     TEXT             DEFAULT '',
+                first_lastname  TEXT    NOT NULL DEFAULT '',
+                second_lastname TEXT             DEFAULT '',
+                full_name       TEXT             DEFAULT '',
+                hire_date       TEXT    NOT NULL,
+                end_date        TEXT,
+                status          TEXT    NOT NULL DEFAULT 'ACTIVE'
             )
         ''')
+
+        # Migración: agrega columnas nuevas si la BD ya existia con el schema anterior
+        migrations = [
+            ('first_name',      "TEXT NOT NULL DEFAULT ''"),
+            ('second_name',     "TEXT DEFAULT ''"),
+            ('first_lastname',  "TEXT NOT NULL DEFAULT ''"),
+            ('second_lastname', "TEXT DEFAULT ''"),
+        ]
+        for col, definition in migrations:
+            try:
+                db.execute(f'ALTER TABLE employees ADD COLUMN {col} {definition}')
+            except Exception:
+                pass  # La columna ya existe, se ignora el error
+
         db.commit()
     app.teardown_appcontext(close_db)

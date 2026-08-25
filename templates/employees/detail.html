@@ -19,16 +19,12 @@
 
 <div class="pageHeader">
     <div class="pageHeaderText">
-        <a href="{% if url_for is defined %}{{ url_for('employees.list') }}{% else %}list.html{% endif %}" class="btn btnSm btnSecondary" style="margin-bottom:0.4rem">
-            <i class="fa-solid fa-arrow-left"></i> Volver a la lista
-        </a>
         <h1>Ficha de Empleado</h1>
+        <p>Información detallada y acciones administrativas del empleado.</p>
     </div>
-    {% if empStatus == 'ACTIVE' %}
-    <button type="button" class="btn btnOutlineDanger" data-modal-target="#modalFinalizarContrato">
-        <i class="fa-solid fa-file-contract"></i> Finalizar contrato
-    </button>
-    {% endif %}
+    <a href="{% if url_for is defined %}{{ url_for('employees.list') }}{% else %}list.html{% endif %}" class="btn btnSecondary">
+        <i class="fa-solid fa-arrow-left"></i> Volver
+    </a>
 </div>
 
 {% if empStatus == 'INACTIVE' %}
@@ -39,42 +35,52 @@
 {% endif %}
 
 <div class="card" style="margin-bottom:0.75rem">
-    <div class="detailCardHeader">
-        <div class="profileAvatarLarge"><i class="fa-solid fa-user"></i></div>
-        <div>
-            <h2 style="font-size:1.15rem;font-weight:800">{{ empName }}</h2>
-            <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.1rem">
-                <span class="fontMono" style="color:var(--textSec);font-size:0.8rem">Doc: {{ empDoc }}</span>
-                <span class="badge {{ 'badgeActive' if empStatus == 'ACTIVE' else 'badgeInactive' }}"><span class="badgeDot"></span> {{ empStatus }}</span>
+    <div class="detailCardHeader" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:1rem">
+            <div class="profileAvatarLarge"><i class="fa-solid fa-user"></i></div>
+            <div>
+                <h2 style="font-size:1.15rem;font-weight:800">{{ empName }}</h2>
+                <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.1rem">
+                    <span class="fontMono" style="color:var(--textSec);font-size:0.8rem">Doc: {{ empDoc }}</span>
+                    <span class="badge {{ 'badgeActive' if empStatus == 'ACTIVE' else 'badgeInactive' }}"><span class="badgeDot"></span> {{ empStatus }}</span>
+                </div>
             </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+            <button type="button" class="btn btnSm btnOutlinePrimary" data-modal-target="#modalEditarEmpleado">
+                <i class="fa-solid fa-pen-to-square"></i> Editar usuario
+            </button>
+            <button type="button" class="btn btnSm btnOutlineDanger" data-modal-target="#modalEliminarEmpleado">
+                <i class="fa-solid fa-trash-can"></i> Eliminar empleado
+            </button>
+            {% if empStatus == 'ACTIVE' %}
+            <button type="button" class="btn btnSm btnOutlineWarning" data-modal-target="#modalFinalizarContrato">
+                <i class="fa-solid fa-file-contract"></i> Finalizar contrato
+            </button>
+            {% endif %}
         </div>
     </div>
 
     <div class="infoGrid">
-        <div class="infoItem"><span class="infoItemLabel">Nombre</span><span class="infoItemValue">{{ empName }}</span></div>
+        <div class="infoItem"><span class="infoItemLabel">Primer nombre</span><span class="infoItemValue">{{ employee.firstName if employee is defined and employee.firstName else '—' }}</span></div>
+        <div class="infoItem"><span class="infoItemLabel">Segundo nombre</span><span class="infoItemValue">{{ employee.secondName if employee is defined and employee.secondName else '—' }}</span></div>
+        <div class="infoItem"><span class="infoItemLabel">Primer apellido</span><span class="infoItemValue">{{ employee.firstLastname if employee is defined and employee.firstLastname else '—' }}</span></div>
+        <div class="infoItem"><span class="infoItemLabel">Segundo apellido</span><span class="infoItemValue">{{ employee.secondLastname if employee is defined and employee.secondLastname else '—' }}</span></div>
         <div class="infoItem"><span class="infoItemLabel">Documento</span><span class="infoItemValue fontMono">{{ empDoc }}</span></div>
         <div class="infoItem"><span class="infoItemLabel">Ingreso</span><span class="infoItemValue"><i class="fa-regular fa-calendar-check" style="color:var(--success)"></i> {{ empHire }}</span></div>
         <div class="infoItem"><span class="infoItemLabel">Finalización</span><span class="infoItemValue">{{ empEnd }}</span></div>
         <div class="infoItem"><span class="infoItemLabel">Estado</span><div><span class="badge {{ 'badgeActive' if empStatus == 'ACTIVE' else 'badgeInactive' }}"><span class="badgeDot"></span> {{ empStatus }}</span></div></div>
     </div>
-
-    <div class="cardFooter" style="display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:0.8rem;color:var(--textSec)"><i class="fa-solid fa-circle-info" style="color:var(--primary)"></i> Información administrativa</span>
-        {% if empStatus == 'ACTIVE' %}
-        <button type="button" class="btn btnSm btnOutlineDanger" data-modal-target="#modalFinalizarContrato"><i class="fa-solid fa-file-contract"></i> Finalizar contrato</button>
-        {% endif %}
-    </div>
 </div>
 
-
-
+<!-- Modal: Finalizar Contrato -->
 <div class="modalOverlay" id="modalFinalizarContrato">
     <div class="modalDialog">
         <div class="modalHeader">
             <h3 class="modalTitle">Finalizar contrato</h3>
             <button type="button" class="modalClose" data-close-modal><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <form action="{% if url_for is defined and employee is defined %}{{ url_for('employees.end_contract', id=employee.id) }}{% else %}#{% endif %}" method="POST" data-validate>
+        <form action="{% if url_for is defined and employee is defined %}{{ url_for('employees.end_contract', id=employee.id) }}{% else %}#{% endif %}" method="POST" data-validate novalidate>
             <div class="modalBody">
                 <p style="font-weight:600;margin-bottom:0.75rem">¿Deseas registrar la finalización del contrato de <strong>{{ empName }}</strong>?</p>
                 <div class="formGroup">
@@ -90,6 +96,96 @@
             <div class="modalFooter">
                 <button type="button" class="btn btnSecondary" data-close-modal>Cancelar</button>
                 <button type="submit" class="btn btnDanger"><i class="fa-solid fa-ban"></i> Confirmar finalización</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Eliminar Empleado -->
+<div class="modalOverlay" id="modalEliminarEmpleado">
+    <div class="modalDialog">
+        <div class="modalHeader">
+            <h3 class="modalTitle">Eliminar empleado</h3>
+            <button type="button" class="modalClose" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form action="{% if url_for is defined and employee is defined %}{{ url_for('employees.delete', id=employee.id) }}{% else %}#{% endif %}" method="POST">
+            <div class="modalBody">
+                <p style="font-weight:600;margin-bottom:0.75rem">¿Estás seguro de que deseas eliminar permanentemente a <strong>{{ empName }}</strong>?</p>
+                <div class="alert alertDanger" style="margin-bottom:0;padding:0.5rem 0.75rem">
+                    <div class="alertIcon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div style="font-size:0.8rem">Esta acción no se puede deshacer y borrará el registro de la base de datos.</div>
+                </div>
+            </div>
+            <div class="modalFooter">
+                <button type="button" class="btn btnSecondary" data-close-modal>Cancelar</button>
+                <button type="submit" class="btn btnDanger"><i class="fa-solid fa-trash-can"></i> Confirmar eliminación</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: Editar Empleado -->
+<div class="modalOverlay" id="modalEditarEmpleado">
+    <div class="modalDialog" style="max-width:560px">
+        <div class="modalHeader">
+            <h3 class="modalTitle"><i class="fa-solid fa-user-pen" style="color:var(--primary)"></i> Editar usuario</h3>
+            <button type="button" class="modalClose" data-close-modal><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form action="{% if url_for is defined and employee is defined %}{{ url_for('employees.edit', id=employee.id) }}{% else %}#{% endif %}" method="POST" data-validate novalidate>
+            <div class="modalBody">
+                <div class="formGrid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.65rem 0.85rem;">
+                    <!-- Nombres -->
+                    <div class="formGroup">
+                        <label for="edit_firstName" class="formLabel">Primer nombre <span class="required">*</span></label>
+                        <input type="text" id="edit_firstName" name="firstName" minlength="2" data-type="name" class="formControl" required autocomplete="off" value="{{ employee.firstName if employee is defined else '' }}">
+                        <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Campo obligatorio</div>
+                    </div>
+
+                    <div class="formGroup">
+                        <label for="edit_secondName" class="formLabel">Segundo nombre <span style="color:var(--textMuted);font-weight:400">(opcional)</span></label>
+                        <input type="text" id="edit_secondName" name="secondName" minlength="2" data-type="name" class="formControl" autocomplete="off" value="{{ employee.secondName if employee is defined else '' }}">
+                        <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Solo debe contener letras</div>
+                    </div>
+
+                    <!-- Apellidos -->
+                    <div class="formGroup">
+                        <label for="edit_firstLastname" class="formLabel">Primer apellido <span class="required">*</span></label>
+                        <input type="text" id="edit_firstLastname" name="firstLastname" minlength="2" data-type="name" class="formControl" required autocomplete="off" value="{{ employee.firstLastname if employee is defined else '' }}">
+                        <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Campo obligatorio</div>
+                    </div>
+
+                    <div class="formGroup">
+                        <label for="edit_secondLastname" class="formLabel">Segundo apellido <span style="color:var(--textMuted);font-weight:400">(opcional)</span></label>
+                        <input type="text" id="edit_secondLastname" name="secondLastname" minlength="2" data-type="name" class="formControl" autocomplete="off" value="{{ employee.secondLastname if employee is defined else '' }}">
+                        <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Solo debe contener letras</div>
+                    </div>
+
+                    <!-- Documento y Fecha -->
+                    <div class="formGroup">
+                        <label for="edit_document" class="formLabel">Documento <span class="required">*</span></label>
+                        <input type="text" id="edit_document" name="document" minlength="3" data-type="digits" inputmode="numeric" class="formControl" required autocomplete="off" value="{{ employee.document if employee is defined else '' }}">
+                        <div class="formError" style="display:none"><i class="fa-solid fa-triangle-exclamation"></i> Documento obligatorio</div>
+                    </div>
+
+                    <div class="formGroup">
+                        <label for="edit_hireDate" class="formLabel">Fecha de ingreso <span class="required">*</span></label>
+                        <input type="date" id="edit_hireDate" name="hireDate" class="formControl" required value="{{ employee.hireDate if employee is defined else '' }}">
+                        <div class="formError" style="display:none"><i class="fa-solid fa-calendar-xmark"></i> Fecha requerida</div>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="formGroup" style="grid-column: 1 / -1;">
+                        <label for="edit_status" class="formLabel">Estado del empleado <span class="required">*</span></label>
+                        <select id="edit_status" name="status" class="formControl" required>
+                            <option value="ACTIVE" {% if employee is defined and employee.status == 'ACTIVE' %}selected{% endif %}>ACTIVE (Activo)</option>
+                            <option value="INACTIVE" {% if employee is defined and employee.status == 'INACTIVE' %}selected{% endif %}>INACTIVE (Inactivo)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modalFooter">
+                <button type="button" class="btn btnSecondary" data-close-modal>Cancelar</button>
+                <button type="submit" class="btn btnPrimary"><i class="fa-solid fa-check"></i> Guardar cambios</button>
             </div>
         </form>
     </div>

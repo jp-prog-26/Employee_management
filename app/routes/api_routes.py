@@ -52,6 +52,18 @@ def api_by_document(document):
 
 
 # ------------------------------------------------------------------ #
+# PUT /api/v1/employees/<id>  — Actualizar empleado
+# ------------------------------------------------------------------ #
+@api_bp.route('/employees/<int:employee_id>', methods=['PUT', 'PATCH'])
+def api_update(employee_id):
+    data = request.get_json(silent=True) or {}
+    emp, errors, code = service.update(employee_id, data)
+    if errors:
+        return jsonify({'error': errors[0]}), code
+    return jsonify({'message': MSG_UPDATED, 'employee': emp}), code
+
+
+# ------------------------------------------------------------------ #
 # PATCH /api/v1/employees/<id>/status  — Cambiar estado
 # ------------------------------------------------------------------ #
 @api_bp.route('/employees/<int:employee_id>/status', methods=['PATCH'])

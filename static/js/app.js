@@ -90,33 +90,93 @@ function initTableFilters() {
 function initAlerts() {
     document.querySelectorAll('.alertClose').forEach(b => b.addEventListener('click', () => {
         const a = b.closest('.alert');
-        if (a) a.remove();
+        if (a) {
+            a.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+            a.style.opacity = '0';
+            a.style.transform = 'translateY(-6px)';
+            setTimeout(() => a.remove(), 250);
+        }
     }));
+
+    document.querySelectorAll('.alert.alertSuccess').forEach(a => {
+        setTimeout(() => {
+            if (a && a.parentNode) {
+                a.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
+                a.style.opacity = '0';
+                a.style.transform = 'translateY(-6px)';
+                setTimeout(() => a.remove(), 350);
+            }
+        }, 4000);
+    });
 }
 
 /* 5. Form Validation */
 function initFormValidation() {
     document.querySelectorAll('form[data-validate]').forEach(f => {
-        const inputs = f.querySelectorAll('input[required], select[required]');
+        f.setAttribute('novalidate', 'true');
+        const inputs = f.querySelectorAll('input[required], select[required], input[minlength], input[data-type]');
+        let hasSubmitted = false;
+        const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s'-]+$/;
+        const digitsRegex = /^\d+$/;
+
         const check = (i) => {
             const g = i.closest('.formGroup');
-            const valid = i.value.trim() !== '';
-            if (g) {
+            const val = i.value.trim();
+            const minLen = parseInt(i.getAttribute('minlength') || '1', 10);
+            const dataType = i.getAttribute('data-type');
+            let valid = true;
+            let errorMsg = '';
+
+            if (i.hasAttribute('required') && val === '') {
+                valid = false;
+                errorMsg = 'Campo obligatorio';
+            } else if (val.length > 0 && val.length < minLen) {
+                valid = false;
+                errorMsg = `Mínimo ${minLen} caracteres`;
+            } else if (val.length > 0 && dataType === 'name' && !nameRegex.test(val)) {
+                valid = false;
+                errorMsg = 'Solo debe contener letras';
+            } else if (val.length > 0 && dataType === 'digits' && !digitsRegex.test(val)) {
+                valid = false;
+                errorMsg = 'Solo debe contener números';
+            }
+
+            if (g && hasSubmitted) {
                 g.classList.toggle('hasError', !valid);
-                g.classList.toggle('hasSuccess', valid);
+                g.classList.toggle('hasSuccess', valid && (i.hasAttribute('required') ? val.length > 0 : true));
                 const err = g.querySelector('.formError');
-                if (err) err.style.display = valid ? 'none' : 'flex';
+                if (err) {
+                    err.style.display = valid ? 'none' : 'flex';
+                    if (!valid && errorMsg) {
+                        err.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${errorMsg}`;
+                    }
+                }
             }
             return valid;
         };
+
         inputs.forEach(i => {
-            i.addEventListener('blur', () => check(i));
-            i.addEventListener('input', () => i.closest('.formGroup')?.classList.contains('hasError') && check(i));
+            i.addEventListener('input', () => {
+                if (hasSubmitted) check(i);
+            });
         });
+
         f.addEventListener('submit', e => {
+            hasSubmitted = true;
             let valid = true;
-            inputs.forEach(i => !check(i) && (valid = false));
-            if (!valid) e.preventDefault();
+            let firstInvalid = null;
+
+            inputs.forEach(i => {
+                if (!check(i)) {
+                    valid = false;
+                    if (!firstInvalid) firstInvalid = i;
+                }
+            });
+
+            if (!valid) {
+                e.preventDefault();
+                if (firstInvalid) firstInvalid.focus();
+            }
         });
     });
 }

@@ -3,13 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gestión de Empleados{% endblock %} - Panel Administrativo</title>
+    <title>EmpControl</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="icon" type="image/jpeg" href="{{ url_for('static', filename='img/favicon.jpg') if url_for is defined else '../static/img/favicon.jpg' }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') if url_for is defined else '../static/css/styles.css' }}">
     {% block extraCss %}{% endblock %}
+    <!-- Anti-flash: aplica el tema ANTES del primer render para evitar parpadeo -->
+    <script>
+        (function() {
+            var t = localStorage.getItem('theme') ||
+                    (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
 </head>
 <body>
     <div class="appLayout">
@@ -68,7 +77,17 @@
                             {% if messages %}
                                 {% for category, message in messages %}
                                     <div class="alert alert{{ category|capitalize if category in ['success', 'error', 'warning', 'info', 'danger'] else 'Info' }}">
-                                        <div class="alertIcon"><i class="fa-solid fa-circle-info"></i></div>
+                                        <div class="alertIcon">
+                                            {% if category == 'success' %}
+                                                <i class="fa-solid fa-circle-check" style="color:var(--success)"></i>
+                                            {% elif category in ['danger', 'error'] %}
+                                                <i class="fa-solid fa-circle-exclamation" style="color:var(--danger)"></i>
+                                            {% elif category == 'warning' %}
+                                                <i class="fa-solid fa-triangle-exclamation" style="color:var(--warning)"></i>
+                                            {% else %}
+                                                <i class="fa-solid fa-circle-info" style="color:var(--primary)"></i>
+                                            {% endif %}
+                                        </div>
                                         <div class="alertContent"><div>{{ message }}</div></div>
                                         <button type="button" class="alertClose" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
                                     </div>
