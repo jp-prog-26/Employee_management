@@ -5,7 +5,7 @@ from app.validators.input_validator import (
 from app.validators.business_validator import (
     validate_no_duplicate_document, validate_date_order, validate_not_already_inactive
 )
-from app.messages.messages import MSG_NOT_FOUND
+from app.messages.messages import MSG_NOT_FOUND, MSG_INVALID_STATUS
 from typing import Optional, List
 from app.models.employee import Employee
 
